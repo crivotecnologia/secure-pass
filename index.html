@@ -105,6 +105,9 @@
               data-bs-target="#mdl-secret-details">
               Novo
             </button>
+            <button id="btnShare" type="button" class="btn btn-sm btn-secondary w-100 pulse mt-2">
+              Compartilhar
+            </button>
           </div>
           <form class="col-12 col-sm-7 offset-sm-2" v-on:submit.prevent="search_secret">
             <div class="row g-2">
@@ -356,6 +359,7 @@
 
   <script src="scripts/variables.js"></script>
   <script src="scripts/main.js"></script>
+  <script src="scripts/transfer.js"></script>
 
   <script>
     // Create an instance of Notyf 
@@ -582,6 +586,33 @@
     $formSecretDetails.parentElement.addEventListener('hidden.bs.modal', function (el) {
       el.target.querySelector('form').reset();
       v.secret = {}
+    })
+
+    btnShare.addEventListener('click', async (ev) => {
+      try {
+        const offer = await createConnection();
+
+        // Converter o offer em base64
+        const offerBase64 = btoa(JSON.stringify(offer));
+
+        // Gerar o link para a página receive-secrets.html com o parâmetro connBase64
+        const url = new URL('receive-secrets.html', window.location.origin);
+        url.searchParams.set('o', offerBase64);
+
+        // Verificar se a API de compartilhamento está disponível
+        if (navigator.share) {
+          await navigator.share({
+            title: 'Secure Pass - Sincronização',
+            text: 'Compartilhe este link para sincronizar seus segredos:',
+            url: url.href
+          });
+          console.log('Link compartilhado com sucesso');
+        } else {
+          console.log('API de compartilhamento não suportada neste navegador');
+        }
+      } catch (error) {
+        console.log(error);
+      }
     })
 
     window.onload = async () => {
