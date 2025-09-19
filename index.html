@@ -469,7 +469,7 @@
           const $search = document.querySelector('input[name=search]');
           const $tag = document.querySelector('select[name=tag]');
 
-          const regex = new RegExp($search.value.trim().toLowerCase(), 'ig');
+          const regex = new RegExp($search.value.trim(), 'i');
           const isTagsPresent = tags => tags.split(',')
             .some(t => t.trim().toLowerCase() === $tag.value.trim().toLowerCase());
 
