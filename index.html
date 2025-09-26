@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
   <link rel="manifest" href="manifest.json" />
 
   <!-- Primary Meta Tags -->
@@ -356,6 +356,7 @@
 
   <script src="scripts/variables.js"></script>
   <script src="scripts/main.js"></script>
+  <script src="scripts/import-secrets.js"></script>
 
   <script>
     // Create an instance of Notyf 
@@ -528,50 +529,9 @@
     $formConfig.parentElement.addEventListener('shown.bs.modal', function (ev) {
       ev.target.querySelector('input').focus();
     })
-    $formConfig.querySelector('#import-secret').addEventListener('change', async function (ev) {
-      try {
 
-        const { data, hash } = JSON.parse(
-          await getFileReader(ev.target.files[0])
-        );
-
-        const importSecret = JSON.parse(decrypted(data, hash));
-        let count = 0;
-
-        for (let impt of importSecret) {
-          const stSecret = storageSecrets.find((s) => s.id === impt.id);
-
-          if (!stSecret) {
-            stSecretSave({
-              ...impt,
-              secret: encrypted(decrypted(impt.secret, hash)),
-            }, true);
-            count++;
-            continue;
-          }
-
-          if (stSecret.id && stSecret.updated_at < impt.updated_at) {
-            stSecretUpdate(stSecret.id, {
-              ...impt,
-              secret: encrypted(decrypted(impt.secret, hash)),
-            }, true);
-            count++;
-            continue;
-          }
-        }
-
-        notyf.success('Importação realizada com sucesso. ' + count + ' segredos importados.');
-
-        bsMdlConfig.hide();
-        v.search_secret();
-
-      } catch (error) {
-        console.log(error);
-        notyf.error(error.message || 'Falha ao carregar seus segredos');
-      } finally {
-        ev.target.value = '';
-      }
-    })
+    // Inicializar sistema de importação limpo e organizado
+    initializeImportSystem();
 
     $formSecretDetails.addEventListener('submit', async function (el) {
       el.preventDefault();
