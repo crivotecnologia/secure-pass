@@ -339,6 +339,17 @@
                 </div>
               </div>
 
+              <div class="col-12 mt-4 pt-3 border-top">
+                <div class="d-flex justify-content-between align-items-center text-muted">
+                  <small>
+                    <strong>{{ variables.product.name }}</strong> v{{ config.version || variables.product.version }}
+                  </small>
+                  <small v-if="config.build">
+                    Build: {{ config.build }}
+                  </small>
+                </div>
+              </div>
+
             </div>
 
           </div>
@@ -550,8 +561,25 @@
       }
 
       v.secrets = storageSecrets.filter() || [];
-      v.config = storageConfig.find() || { ...variables };
+      v.config = {
+        ...variables,
+        version: variables.product.version,
+        build: variables.product.build,
+        environment: variables.product.environment,
+        ...(storageConfig.find() || {})
+      };
     }
+
+    document.querySelector(`#mdl-config`)
+      .addEventListener('shown.bs.modal', function (ev) {
+          v.config = {
+            ...variables,
+            version: variables.product.version,
+            build: variables.product.build,
+            environment: variables.product.environment,
+            ...(storageConfig.find() || {})
+          };
+      })
   </script>
 </body>
 
